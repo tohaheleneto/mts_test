@@ -7,7 +7,10 @@ import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -21,24 +24,25 @@ public class Task {
     @Type(type = "uuid-char")
     UUID id;
 
-    LocalDateTime timestamp;
+    ZonedDateTime timestamp;
 
-    public LocalDateTime getTimestamp() {
+    public ZonedDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(ZonedDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
-    public Task(String status, LocalDateTime date) {
+    public Task(String status, ZonedDateTime date) {
         this.status = status;
         this.timestamp = date;
     }
 
     public Task() {
         status = "created";
-        timestamp = LocalDateTime.now();
+        Instant now = Instant.now();
+        timestamp = now.atZone(ZoneId.of("Europe/Moscow"));
     }
 
     public void setStatus(String status) {
