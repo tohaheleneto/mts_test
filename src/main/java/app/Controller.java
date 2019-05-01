@@ -4,11 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 @RestController
@@ -47,10 +53,10 @@ public class Controller
 
         try{
             UUID uuid = UUID.fromString(id);
-            Task task = taskRepository.findById(uuid).get();
-            if (task == null)
-                return new ResponseEntity<>(HttpStatus.valueOf(404));
-            return new ResponseEntity<>(task,HttpStatus.valueOf(200));
+            Optional<Task> task = taskRepository.findById(uuid);
+            if (task.isPresent())
+                return new ResponseEntity<>(task.get(),HttpStatus.valueOf(200));
+            return new ResponseEntity<>(HttpStatus.valueOf(404));
         } catch (IllegalArgumentException exception){
             return new ResponseEntity<>(HttpStatus.valueOf(400));
         }
