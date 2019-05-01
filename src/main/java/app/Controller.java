@@ -65,7 +65,10 @@ public class Controller
             return new ResponseEntity<>(HttpStatus.valueOf(400));
         }
     }
-
+    
+    /*
+        Method that start threads to managing of unfinished task if server restarted
+    */
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
         ArrayList<Task> tasksNeedToChangeStatus = new ArrayList<>();
