@@ -1,6 +1,8 @@
 package app;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -59,6 +63,40 @@ public class Controller
             return new ResponseEntity<>(HttpStatus.valueOf(404));
         } catch (IllegalArgumentException exception){
             return new ResponseEntity<>(HttpStatus.valueOf(400));
+        }
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void doSomethingAfterStartup() {
+        ArrayList<Task> tasksNeedToChangeStatus = new ArrayList<>();
+
+        for (Task task : taskRepository.findAll())
+        {
+            if (task.status.equals("running")) {
+                if (task.getTimestamp().until(LocalDateTime.now(), ChronoUnit.MINUTES) >= 2) {
+                    task.setTimestamp(task.getTimestamp().plusMinutes(2));
+                    task.setStatus("finished");
+                    taskRepository.save(task);
+                }
+                else {
+                    tasksNeedToChangeStatus.add(task);
+                }
+            }
+        }
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(tasksNeedToChangeStatus.size());
+        for (Task task : tasksNeedToChangeStatus)
+        {
+            service.submit(() -> {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(LocalDateTime.now().until(task.timestamp.plusMinutes(2), ChronoUnit.MILLIS));
+                }catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                task.setTimestamp(task.getTimestamp().plusMinutes(2));
+                task.setStatus("finished");
+                taskRepository.save(task);
+            });
         }
     }
 
