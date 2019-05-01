@@ -13,7 +13,7 @@ import java.util.concurrent.*;
 
 @RestController
 @EnableAsync
-class Controller
+public class Controller
 {
 
     @Autowired
@@ -54,6 +54,11 @@ class Controller
         } catch (IllegalArgumentException exception){
             return new ResponseEntity<>(HttpStatus.valueOf(400));
         }
+    }
+
+    @GetMapping("/")
+    public String testHeroku() {
+        return "Hello,world!";
     }
 
 }
