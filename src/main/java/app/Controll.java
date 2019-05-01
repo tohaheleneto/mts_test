@@ -13,7 +13,7 @@ import java.util.concurrent.*;
 
 @RestController
 @EnableAsync
-class Controll
+class Controller
 {
 
     @Autowired
@@ -25,7 +25,7 @@ class Controll
         taskRepository.save(task);
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         service.submit(() -> {
-            Task us = taskRepository.findByid(task.id);
+            Task us = taskRepository.findById(task.id).get();
             us.setStatus("running");
             us.setTimestamp(LocalDateTime.now());
             taskRepository.save(us);
@@ -47,7 +47,7 @@ class Controll
 
         try{
             UUID uuid = UUID.fromString(id);
-            Task task = taskRepository.findByid(uuid);
+            Task task = taskRepository.findById(uuid).get();
             if (task == null)
                 return new ResponseEntity<>(HttpStatus.valueOf(404));
             return new ResponseEntity<>(task,HttpStatus.valueOf(200));

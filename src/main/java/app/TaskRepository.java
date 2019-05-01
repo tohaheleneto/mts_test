@@ -9,5 +9,4 @@ import java.util.UUID;
 
 @Repository
 public interface TaskRepository extends CrudRepository<Task, UUID> {
-    Task findByid(UUID id);
 }
