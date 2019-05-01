@@ -33,8 +33,7 @@ public class Controller
     public ResponseEntity<?> doSmth() {
         Task task = new Task();
         taskRepository.save(task);
-        ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-        service.submit(() -> {
+        new Thread(() -> {
             Task us = taskRepository.findById(task.id).get();
             us.setStatus("running");
             us.setTimestamp(LocalDateTime.now());
@@ -48,7 +47,7 @@ public class Controller
             us.setTimestamp(LocalDateTime.now());
             us.setStatus("finished");
             taskRepository.save(us);
-        });
+        }).start();
         return new ResponseEntity<>(task.id,HttpStatus.valueOf(202));
     }
 
