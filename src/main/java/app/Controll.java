@@ -19,7 +19,6 @@ class Controll
     @Autowired
     private TaskRepository taskRepository;
 
-    @PutMapping(produces = {"application/jackson"})
     @PostMapping("/task")
     public ResponseEntity<?> doSmth() {
         Task task = new Task();
