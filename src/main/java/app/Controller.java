@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -35,8 +33,7 @@ public class Controller
         service.submit(() -> {
             Task us = taskRepository.findById(task.id).get();
             us.setStatus("running");
-            Instant now = Instant.now();
-            us.setTimestamp(now.atZone(ZoneId.of("Europe/Moscow")));
+            us.setTimestamp(LocalDateTime.now());
             taskRepository.save(us);
             try {
                 TimeUnit.MINUTES.sleep(2);
@@ -44,8 +41,7 @@ public class Controller
             {
                 e.printStackTrace();
             }
-            now = Instant.now();
-            us.setTimestamp(now.atZone(ZoneId.of("Europe/Moscow")));
+            us.setTimestamp(LocalDateTime.now());
             us.setStatus("finished");
             taskRepository.save(us);
         });
