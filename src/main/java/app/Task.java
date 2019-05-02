@@ -16,6 +16,11 @@ public class Task {
     @Type(type = "uuid-char")
     UUID id;
 
+    /* Getter modified to format json properly */
+    public UUID Id() {
+        return id;
+    }
+
     LocalDateTime timestamp;
 
     public LocalDateTime getTimestamp() {
