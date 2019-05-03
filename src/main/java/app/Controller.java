@@ -25,19 +25,18 @@ public class Controller
     public ResponseEntity<?> create() {
         Task task = taskRepository.save(new Task());
         taskScheduler.submit(() -> {
-            Task us = taskRepository.findById(task.id).get();
-            us.setStatus("running");
-            us.setTimestamp(LocalDateTime.now());
-            taskRepository.save(us);
+            task.setStatus("running");
+            task.setTimestamp(LocalDateTime.now());
+            taskRepository.save(task);
             try {
                 TimeUnit.MINUTES.sleep(2);
             }catch (Exception e)
             {
                 e.printStackTrace();
             }
-            us.setTimestamp(LocalDateTime.now());
-            us.setStatus("finished");
-            taskRepository.save(us);
+            task.setTimestamp(LocalDateTime.now());
+            task.setStatus("finished");
+            taskRepository.save(task);
         });
         return new ResponseEntity<>(task.Id(),HttpStatus.valueOf(202));
     }
