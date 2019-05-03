@@ -3,10 +3,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -49,17 +47,11 @@ public class Main {
         ScheduledExecutorService service = Executors.newScheduledThreadPool(tasksNeedToChangeStatus.size());
         for (Task task : tasksNeedToChangeStatus)
         {
-            service.submit(() -> {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(LocalDateTime.now().until(task.timestamp.plusMinutes(2), ChronoUnit.MILLIS));
-                }catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+            service.schedule(() -> {
                 task.setTimestamp(task.getTimestamp().plusMinutes(2));
                 task.setStatus("finished");
                 taskRepository.save(task);
-            });
+            }, LocalDateTime.now().until(task.timestamp.plusMinutes(2), ChronoUnit.MILLIS),TimeUnit.MILLISECONDS);
         }
     }
 }
