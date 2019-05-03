@@ -3,6 +3,7 @@ package app;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -17,23 +18,27 @@ public class Controller
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    ThreadPoolTaskScheduler taskScheduler;
+
     @PostMapping("/task")
     public ResponseEntity<?> create() {
         Task task = taskRepository.save(new Task());
-        new Thread(() -> {
-            task.setStatus("running");
-            task.setTimestamp(LocalDateTime.now());
-            taskRepository.save(task);
+        taskScheduler.submit(() -> {
+            Task us = taskRepository.findById(task.id).get();
+            us.setStatus("running");
+            us.setTimestamp(LocalDateTime.now());
+            taskRepository.save(us);
             try {
                 TimeUnit.MINUTES.sleep(2);
             }catch (Exception e)
             {
                 e.printStackTrace();
             }
-            task.setTimestamp(LocalDateTime.now());
-            task.setStatus("finished");
-            taskRepository.save(task);
-        }).start();
+            us.setTimestamp(LocalDateTime.now());
+            us.setStatus("finished");
+            taskRepository.save(us);
+        });
         return new ResponseEntity<>(task.Id(),HttpStatus.valueOf(202));
     }
 
