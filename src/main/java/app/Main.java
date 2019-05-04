@@ -30,7 +30,7 @@ public class Main {
     public ThreadPoolTaskScheduler taskScheduler()
     {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(100);
+        scheduler.setPoolSize(Integer.MAX_VALUE);
         return scheduler;
     }
 

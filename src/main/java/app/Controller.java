@@ -38,7 +38,7 @@ public class Controller
             task.setStatus("finished");
             taskRepository.save(task);
         });
-        return new ResponseEntity<>(task.Id(),HttpStatus.valueOf(202));
+        return new ResponseEntity<>(task.getId(),HttpStatus.valueOf(202));
     }
 
     @GetMapping("/task/{id}")
